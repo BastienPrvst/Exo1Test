@@ -48,6 +48,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password;
 
     #[NotBlank]
+    #[NotCompromisedPassword]
+    #[PasswordStrength]
     private ?string $plainPassword = null;
 
     public function getId(): ?int

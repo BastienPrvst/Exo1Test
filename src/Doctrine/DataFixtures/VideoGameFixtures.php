@@ -2,6 +2,8 @@
 
 namespace App\Doctrine\DataFixtures;
 
+use App\Model\Entity\Review;
+use App\Model\Entity\Tag;
 use App\Model\Entity\User;
 use App\Model\Entity\VideoGame;
 use App\Rating\CalculateAverageRating;
@@ -16,6 +18,7 @@ use function array_fill_callback;
 
 final class VideoGameFixtures extends Fixture implements DependentFixtureInterface
 {
+
     public function __construct(
         private readonly Generator $faker,
         private readonly CalculateAverageRating $calculateAverageRating,
@@ -26,6 +29,7 @@ final class VideoGameFixtures extends Fixture implements DependentFixtureInterfa
     public function load(ObjectManager $manager): void
     {
         $users = $manager->getRepository(User::class)->findAll();
+		$tags = $manager->getRepository(Tag::class)->findAll();
 
         $videoGames = array_fill_callback(0, 50, fn (int $index): VideoGame => (new VideoGame)
             ->setTitle(sprintf('Jeu vidéo %d', $index))
@@ -37,14 +41,32 @@ final class VideoGameFixtures extends Fixture implements DependentFixtureInterfa
             ->setImageSize(2_098_872)
         );
 
-        // TODO : Ajouter les tags aux vidéos
+		array_walk($videoGames, static function (VideoGame $videoGame) use ($tags): void {
+			$randTags = array_rand($tags, 3);
+			foreach ($randTags as $tag) {
+				$videoGame->getTags()->add($tags[$tag]);
+			}
+		});
+
+		array_walk($videoGames, function (VideoGame $videoGame) use ($manager, $users): void {
+			$reviewNumber = random_int(1, 5);
+			for ($i = 0; $i < $reviewNumber; $i++) {
+				$rating = random_int(1, 5);
+				$rand = random_int(1, 2);
+				$review = new Review();
+				$review
+					->setVideoGame($videoGame)
+					->setUser($users[array_rand($users)])
+					->setRating($rating)
+					->setComment($rand === 1 ? $this->faker->paragraphs(3, true) : '');
+				$manager->persist($review);
+			}
+		});
+
 
         array_walk($videoGames, [$manager, 'persist']);
 
         $manager->flush();
-
-        // TODO : Ajouter des reviews aux vidéos
-
     }
 
     public function getDependencies(): array
