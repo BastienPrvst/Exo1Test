@@ -21,19 +21,36 @@ class CalculAverageTest extends TestCase
 		$this->assertNull($game->getAverageRating());
     }
 
-	public function testCalculateAverage(): void
+	/**
+	 * @dataProvider AverageDataProvider
+	 */
+	public function testCalculateAverage(?array $reviewsValues): void
 	{
 		$game = new VideoGame();
-		for ($i = 1; $i < 6; $i++) {
-			$review = new Review();
-			$review->setVideoGame($game);
-			$review->setRating($i);
-			$game->getReviews()->add($review);
+		if (!empty($reviewsValues)) {
+			foreach ($reviewsValues as $iValue) {
+				$review = new Review();
+				$review->setVideoGame($game);
+				$review->setRating($iValue);
+				$game->getReviews()->add($review);
+			}
+
+			$expectedValue = ceil(array_sum($reviewsValues) /count($reviewsValues));
+		}else{
+			$expectedValue = null;
 		}
+
 
 		$handler = new RatingHandler();
 		$handler->calculateAverage($game);
-		$this->assertEquals(3, $game->getAverageRating());
+		$this->assertEquals($expectedValue, $game->getAverageRating());
+	}
+
+	public function averageDataProvider(): \Generator
+	{
+		yield [[1, 2, 3]];
+		yield [[]];
+		yield [[5, 5, 4, 5, 3, 2, 1, 2, 5]];
 	}
 
 }
