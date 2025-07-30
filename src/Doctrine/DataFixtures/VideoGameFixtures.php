@@ -14,6 +14,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Generator;
 
+use Psr\Log\LoggerInterface;
 use function array_fill_callback;
 
 final class VideoGameFixtures extends Fixture implements DependentFixtureInterface
@@ -22,7 +23,7 @@ final class VideoGameFixtures extends Fixture implements DependentFixtureInterfa
     public function __construct(
         private readonly Generator $faker,
         private readonly CalculateAverageRating $calculateAverageRating,
-        private readonly CountRatingsPerValue $countRatingsPerValue
+        private readonly CountRatingsPerValue $countRatingsPerValue,
     ) {
     }
 
@@ -48,7 +49,7 @@ final class VideoGameFixtures extends Fixture implements DependentFixtureInterfa
 			}
 		});
 
-		array_walk($videoGames, function (VideoGame $videoGame) use ($manager, $users): void {
+		array_walk($videoGames, function (VideoGame $videoGame) use ( $users, $manager): void {
 			$reviewNumber = random_int(1, 5);
 			for ($i = 0; $i < $reviewNumber; $i++) {
 				$rating = random_int(1, 5);
@@ -59,13 +60,15 @@ final class VideoGameFixtures extends Fixture implements DependentFixtureInterfa
 					->setUser($users[array_rand($users)])
 					->setRating($rating)
 					->setComment($rand === 1 ? $this->faker->paragraphs(3, true) : '');
+				$videoGame->getReviews()->add($review);
 				$manager->persist($review);
+
 			}
+			$this->calculateAverageRating->calculateAverage($videoGame);
+			$this->countRatingsPerValue->countRatingsPerValue($videoGame);
 		});
 
-
-        array_walk($videoGames, [$manager, 'persist']);
-
+	    array_walk($videoGames, [$manager, 'persist']);
         $manager->flush();
     }
 

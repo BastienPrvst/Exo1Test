@@ -3,10 +3,7 @@
 namespace App\Tests;
 
 use App\Model\Entity\Review;
-use App\Model\Entity\User;
 use App\Model\Entity\VideoGame;
-use Doctrine\Common\Collections\ArrayCollection;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use App\Rating\RatingHandler;
 
@@ -40,7 +37,6 @@ class CalculAverageTest extends TestCase
 			$expectedValue = null;
 		}
 
-
 		$handler = new RatingHandler();
 		$handler->calculateAverage($game);
 		$this->assertEquals($expectedValue, $game->getAverageRating());
@@ -51,6 +47,7 @@ class CalculAverageTest extends TestCase
 		yield [[1, 2, 3]];
 		yield [[]];
 		yield [[5, 5, 4, 5, 3, 2, 1, 2, 5]];
+		yield [[1,1,1,2]];
 	}
 
 }
