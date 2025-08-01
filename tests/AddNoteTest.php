@@ -4,6 +4,9 @@ namespace App\Tests;
 
 use App\Model\Entity\Review;
 use App\Model\Entity\User;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
+use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,7 +14,6 @@ use Faker\Factory;
 
 class AddNoteTest extends WebTestCase
 {
-
 	public function setUp(): void
 	{
 		$this->client = static::createClient();
@@ -28,6 +30,22 @@ class AddNoteTest extends WebTestCase
 		self::assertResponseStatusCodeSame(Response::HTTP_OK);
 	}
 
+	public function testNoAuthorizedUserReview(): void
+	{
+
+		$this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('video_games_show', ['slug' => 'jeu-video-5']));
+
+		self::assertSelectorTextNotContains('button', 'Poster');
+		$this->client->request(Request::METHOD_POST, $this->urlGenerator->generate('video_games_show', ['slug' => 'jeu-video-5']));
+		self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+	}
+
+
+	/**
+	 * @throws OptimisticLockException
+	 * @throws RandomException
+	 * @throws ORMException
+	 */
 	public function testPostReview(): void
 	{
 		$testUser = $this->userRepo->find(11);
@@ -62,9 +80,10 @@ class AddNoteTest extends WebTestCase
 		]);
 
 		self::assertCount(1, $review);
-		self::assertSelectorNotExists('btn-primary py-2');
+		self::assertSelectorTextNotContains('button', 'Poster');
 		if ($review !== null){
 			$this->entityManager->remove($review[0]);
+			$this->entityManager->flush();
 		}
 
 	}
