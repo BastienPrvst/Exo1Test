@@ -17,7 +17,9 @@ abstract class FunctionalTestCase extends WebTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->client = static::createClient();
+        $this->client = static::createClient([
+			'environment' => 'test',
+        ]);
     }
 
     protected function getEntityManager(): EntityManagerInterface

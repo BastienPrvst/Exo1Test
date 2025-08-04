@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Unit;
 
 use App\Model\Entity\Review;
 use App\Model\Entity\VideoGame;
-use PHPUnit\Framework\TestCase;
 use App\Rating\RatingHandler;
+use PHPUnit\Framework\TestCase;
 
 class CalculAverageTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Unit;
 
 use App\Model\Entity\NumberOfRatingPerValue;
 use App\Model\Entity\Review;

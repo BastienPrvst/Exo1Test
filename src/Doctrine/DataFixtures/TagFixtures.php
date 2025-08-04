@@ -12,14 +12,6 @@ use Faker\Generator;
 class TagFixtures extends Fixture
 {
 
-	public function __construct(
-		private readonly Generator $faker,
-		private readonly CalculateAverageRating $calculateAverageRating,
-		private readonly CountRatingsPerValue $countRatingsPerValue
-	)
-	{
-	}
-
 	public function load(ObjectManager $manager): void
     {
 		$videosGamesTag = [

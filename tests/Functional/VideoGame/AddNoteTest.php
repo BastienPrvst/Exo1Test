@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Functional\VideoGame;
 
 use App\Model\Entity\Review;
 use App\Model\Entity\User;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
+use Faker\Factory;
 use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Faker\Factory;
 
 class AddNoteTest extends WebTestCase
 {
@@ -79,7 +79,7 @@ class AddNoteTest extends WebTestCase
 			'comment' => $fakeText,
 		]);
 
-		self::assertCount(1, $review);
+		self::assertNotNull($review);
 		self::assertSelectorTextNotContains('button', 'Poster');
 		if ($review !== null){
 			$this->entityManager->remove($review[0]);

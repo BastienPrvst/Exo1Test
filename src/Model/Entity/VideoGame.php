@@ -215,6 +215,16 @@ class VideoGame
         return $this->numberOfRatingsPerValue;
     }
 
+	public function getUpdatedAt(): DateTimeImmutable
+	{
+		return $this->updatedAt;
+	}
+
+	public function setUpdatedAt(DateTimeImmutable $updatedAt): void
+	{
+		$this->updatedAt = $updatedAt;
+	}
+
     /**
      * @return Collection<Tag>
      */
