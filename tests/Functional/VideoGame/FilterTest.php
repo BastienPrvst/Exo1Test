@@ -7,6 +7,7 @@ namespace App\Tests\Functional\VideoGame;
 use App\Model\Entity\Tag;
 use App\Model\Entity\VideoGame;
 use App\Tests\Functional\FunctionalTestCase;
+use Symfony\Component\DomCrawler\Form;
 
 
 final class FilterTest extends FunctionalTestCase
@@ -31,59 +32,68 @@ final class FilterTest extends FunctionalTestCase
     }
 
 	/**
-	 * @param array $data
+	 * @param array $dataTag
 	 * @return void
 	 * @dataProvider tagsProviders
 	 */
-	public function testFilterVideoGammesByTags(array $data):void
+	public function testFilterVideoGammesByTags(array $dataTag):void
 	{
 		$this->get('/');
 		self::assertResponseIsSuccessful();
 
 		$crawler = $this->client->getCrawler();
 		$form = $crawler->selectButton('Filtrer')->form();
+
 		$doctrine = $this->client->getContainer()->get('doctrine.orm.entity_manager');
 		$tagRepo = $doctrine->getRepository(Tag::class);
 		$gamesRepo = $doctrine->getRepository(VideoGame::class);
 
-		//Si le dataprovider n'est pas vide
+		$allTags = $tagRepo->findAll();
+		$allTagNames = array_map(static fn(Tag $tag) => $tag->getName(), $allTags);
+		$badTags = array_filter($dataTag, static function (string $tagName) use ($allTagNames) {
+			return !in_array($tagName, $allTagNames, true);
+		});
 
-		if (!empty($data)){
-			$formData = [];
+		$expectedGames = 50;
+		if (empty($badTags)){
 
-			foreach ($data as $tagName) {
-				$tag = $tagRepo->findOneBy(['name' => $tagName]);
-				if ($tag) {
-					$formData['filter[tags]'][] = $tag->getId();
-				}
+			$values = [];
+			foreach ($dataTag as $tagName) {
+				/** @var Tag|null $tag */
+				$tag = $tagRepo->findOneByName($tagName);
+				$values[] = (string)$tag->getId();
 			}
+			$this->get('/', [
+				'filter' => ['tags' => $values],
+			]);
+			self::assertResponseIsSuccessful();
 
-			$this->client->submit($form, $formData);
-		}else{
-			//Si vide
-			$this->client->submit($form);
+			$expectedGames = 0;
+			$games = $gamesRepo->findAll();
+
+			foreach ($games as $game) {
+				$gameTags = $game->getTags();
+				$gameTagNames = array_map(static fn($tag) => $tag->getName(), $gameTags->toArray());
+				$match = true;
+				foreach($dataTag as $data){
+					if (!in_array($data, $gameTagNames, true)){
+						$match = false;
+						break;
+					}
+				}
+
+				if ($match === true){
+					$expectedGames++;
+				}
+
+			}
 		}
 
+		self::assertSelectorTextContains('div.fw-bold',"sur les $expectedGames jeux vidéo");
 
-
-		$expectedValues = [];
-		$games = $gamesRepo->findAll();
-		foreach ($games as $game) {
-			/* @var $game VideoGame */
-			$tags = $game->getTags();
-			foreach ($tags as $tag) {
-				if (in_array($tag->getName(), $data, true)) {
-					$expectedValues[] = $game->getTitle();
-				}
-			}
-		}
-
-		$expectedGames = count($expectedValues);
-
-		self::assertSelectorCount($expectedGames, 'article.game.game-card');
 	}
 
-	public function tagsProviders(): \Generator
+	public static function tagsProviders(): \Generator
 	{
 		yield [[
 			'RPG',
@@ -108,3 +118,9 @@ final class FilterTest extends FunctionalTestCase
 
 	}
 }
+
+
+//$buttonLabel = $crawler->filterXPath("//label[contains(normalize-space(string()), '$tagName')]")->first();
+//$buttonFor = $buttonLabel->attr('for');
+//$array = explode('_', $buttonFor);
+//$form["filter[tags][$array[2]]"];

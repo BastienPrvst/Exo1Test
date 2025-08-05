@@ -3,11 +3,8 @@
 namespace App\Doctrine\DataFixtures;
 
 use App\Model\Entity\Tag;
-use App\Rating\CalculateAverageRating;
-use App\Rating\CountRatingsPerValue;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Faker\Generator;
 
 class TagFixtures extends Fixture
 {

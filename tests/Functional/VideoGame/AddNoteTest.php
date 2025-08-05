@@ -48,7 +48,7 @@ class AddNoteTest extends WebTestCase
 	 */
 	public function testPostReview(): void
 	{
-		$testUser = $this->userRepo->find(11);
+		$testUser = $this->userRepo->find(1);
 		$this->client->loginUser($testUser);
 		$crawler = $this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('video_games_show', ['slug' => 'jeu-video-5']));
 
