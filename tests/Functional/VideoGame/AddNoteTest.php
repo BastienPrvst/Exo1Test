@@ -4,8 +4,6 @@ namespace App\Tests\Functional\VideoGame;
 
 use App\Model\Entity\Review;
 use App\Model\Entity\User;
-use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\OptimisticLockException;
 use Faker\Factory;
 use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -14,6 +12,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AddNoteTest extends WebTestCase
 {
+	private \Symfony\Bundle\FrameworkBundle\KernelBrowser $client;
+	private \Symfony\Component\Routing\Generator\UrlGeneratorInterface $urlGenerator;
+	private \Doctrine\ORM\EntityRepository $userRepo;
+	private \Doctrine\ORM\EntityRepository $reviewRepo;
+	private \Doctrine\ORM\EntityManagerInterface $entityManager;
+
 	public function setUp(): void
 	{
 		$this->client = static::createClient();
@@ -30,24 +34,8 @@ class AddNoteTest extends WebTestCase
 		self::assertResponseStatusCodeSame(Response::HTTP_OK);
 	}
 
-//	public function testNoAuthorizedUserReview(): void
-//	{
-//
-//		$this->client->request(Request::METHOD_POST, '/jeu-video-5', [
-//			'review' => [
-//				'comment' => 'Test comment',
-//				'rating' => 5,
-//				'_token' => 'gfervgrtgf'
-//			]
-//		]);
-//		self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
-//	}
-
-
 	/**
-	 * @throws OptimisticLockException
 	 * @throws RandomException
-	 * @throws ORMException
 	 */
 	public function testPostReview(): void
 	{
@@ -60,7 +48,7 @@ class AddNoteTest extends WebTestCase
 
 
 		$faker = Factory::create();
-		$randNumber = random_int(1, 5);
+		$randNumber = (string)random_int(1, 5);
 		$fakeText = $faker->text();
 
 		$form = $crawler->selectButton('Poster')->form();
@@ -82,12 +70,11 @@ class AddNoteTest extends WebTestCase
 			'comment' => $fakeText,
 		]);
 
-		self::assertNotNull($review);
+		self::assertInstanceOf(Review::class, $review);
 		self::assertSelectorTextNotContains('button', 'Poster');
-		if ($review !== null){
-			$this->entityManager->remove($review[0]);
-			$this->entityManager->flush();
-		}
+
+		$this->entityManager->remove($review[0]);
+		$this->entityManager->flush();
 
 	}
 

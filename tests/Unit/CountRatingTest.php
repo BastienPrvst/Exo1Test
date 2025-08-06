@@ -35,7 +35,8 @@ class CountRatingTest extends TestCase
 					2 => $expectedValues->increaseTwo(),
 					3 => $expectedValues->increaseThree(),
 					4 => $expectedValues->increaseFour(),
-					5 => $expectedValues->increaseFive()
+					5 => $expectedValues->increaseFive(),
+					default => null,
 				};
 			}
 		}
@@ -45,7 +46,7 @@ class CountRatingTest extends TestCase
 
     }
 
-	public function provideCountRatingsPerValue(): \Generator
+	public static function provideCountRatingsPerValue(): \Generator
 	{
 		yield [[1, 1, 2, 1, 5]];
 		yield [[1, 1, 2, 1, 5, 4, 1, 5, 4, 3, 2]];

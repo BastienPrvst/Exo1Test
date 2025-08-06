@@ -42,6 +42,7 @@ final class VideoGameController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->denyAccessUnlessGranted('review', $videoGame);
             $review->setVideoGame($videoGame);
+
             $review->setUser($this->getUser());
             $entityManager->persist($review);
             $entityManager->flush();
