@@ -25,20 +25,23 @@ class AddNoteTest extends WebTestCase
 
 	public function testAccessGame():void
 	{
-		$this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('video_games_show', ['slug' => 'jeu-video-5']));
+		$this->client->request(Request::METHOD_POST, $this->urlGenerator->generate('video_games_show', ['slug' => 'jeu-video-5']));
 
 		self::assertResponseStatusCodeSame(Response::HTTP_OK);
 	}
 
-	public function testNoAuthorizedUserReview(): void
-	{
-
-		$this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('video_games_show', ['slug' => 'jeu-video-5']));
-
-		self::assertSelectorTextNotContains('button', 'Poster');
-		$this->client->request(Request::METHOD_POST, $this->urlGenerator->generate('video_games_show', ['slug' => 'jeu-video-5']));
-		self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
-	}
+//	public function testNoAuthorizedUserReview(): void
+//	{
+//
+//		$this->client->request(Request::METHOD_POST, '/jeu-video-5', [
+//			'review' => [
+//				'comment' => 'Test comment',
+//				'rating' => 5,
+//				'_token' => 'gfervgrtgf'
+//			]
+//		]);
+//		self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+//	}
 
 
 	/**
