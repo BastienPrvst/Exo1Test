@@ -119,8 +119,3 @@ final class FilterTest extends FunctionalTestCase
 	}
 }
 
-
-//$buttonLabel = $crawler->filterXPath("//label[contains(normalize-space(string()), '$tagName')]")->first();
-//$buttonFor = $buttonLabel->attr('for');
-//$array = explode('_', $buttonFor);
-//$form["filter[tags][$array[2]]"];
