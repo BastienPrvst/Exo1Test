@@ -42,7 +42,7 @@ class CalculAverageTest extends TestCase
 		$this->assertEquals($expectedValue, $game->getAverageRating());
 	}
 
-	public function averageDataProvider(): \Generator
+	public static function averageDataProvider(): \Generator
 	{
 		yield [[1, 2, 3]];
 		yield [[]];

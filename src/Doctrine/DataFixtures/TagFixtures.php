@@ -27,7 +27,6 @@ class TagFixtures extends Fixture
 	    'Coop'
     ];
 
-
 	    $tags = array_fill_callback(0, count($videosGamesTag) - 1, static fn (int $index): Tag => (new Tag)
 		    ->setName($videosGamesTag[$index])
 	    );

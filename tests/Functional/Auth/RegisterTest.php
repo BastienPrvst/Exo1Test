@@ -26,6 +26,11 @@ final class RegisterTest extends FunctionalTestCase
         self::assertSame('username', $user->getUsername());
         self::assertSame('user@email.com', $user->getEmail());
         self::assertTrue($userPasswordHasher->isPasswordValid($user, 'SuperPassword123!'));
+	    $userToDelete = $this->getEntityManager()->getRepository(User::class)->findOneBy([
+			'email' => $user->getEmail(),
+	    ]);
+		$em = $this->getEntityManager();
+		$em->remove($userToDelete);
     }
 
     /**

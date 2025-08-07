@@ -64,7 +64,7 @@ class AddNoteTest extends WebTestCase
 		self::assertSelectorTextContains('div.list-group-item:last-child h3', $testUser->getUsername());
 
 		//Vérification de la review dans la BDD
-		$review = $this->reviewRepo->findBy([
+		$review = $this->reviewRepo->findOneBy([
 			'user' => $testUser,
 			'rating' => $randNumber,
 			'comment' => $fakeText,
@@ -73,7 +73,7 @@ class AddNoteTest extends WebTestCase
 		self::assertInstanceOf(Review::class, $review);
 		self::assertSelectorTextNotContains('button', 'Poster');
 
-		$this->entityManager->remove($review[0]);
+		$this->entityManager->remove($review);
 		$this->entityManager->flush();
 
 	}
