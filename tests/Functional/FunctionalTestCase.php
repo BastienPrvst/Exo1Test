@@ -48,4 +48,5 @@ abstract class FunctionalTestCase extends WebTestCase
 
         $this->client->loginUser($user);
     }
+
 }
